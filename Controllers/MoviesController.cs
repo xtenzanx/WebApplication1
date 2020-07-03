@@ -70,9 +70,17 @@ namespace WebApplication1.Controllers
         }
 
         // GET: Movies/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
-            return View();
+            IQueryable<string> genreQuery = from g in _context.Genre
+                                            select g.Title;
+
+            var movieEditVM = new MovieEditViewModel
+            {
+                Genres = new SelectList(await genreQuery.Distinct().ToListAsync())
+            };
+
+            return View(movieEditVM);
         }
 
         // POST: Movies/Create
@@ -105,7 +113,19 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
-            return View(movie);
+
+
+
+            IQueryable<string> genreQuery = from g in _context.Genre
+                                            select g.Title;
+
+            var movieEditVM = new MovieEditViewModel
+            {
+                Genres = new SelectList(await genreQuery.Distinct().ToListAsync()),
+                Movie = movie
+            };
+
+            return View(movieEditVM);
         }
 
         // POST: Movies/Edit/5

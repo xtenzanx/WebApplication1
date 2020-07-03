@@ -19,9 +19,8 @@ namespace WebApplication1.Models
         [DataType(DataType.Date)]
         public DateTime ReleaseDate { get; set; }
 
-        [RegularExpression(@"^[A-Z]+[a-zA-Z]*$")]
         [Required]
-        [StringLength(30)]
+        [StringLength(50)]
         public string Genre { get; set; }
 
         [Range(1, 100)]
