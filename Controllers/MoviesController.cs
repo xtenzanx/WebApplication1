@@ -84,6 +84,7 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
+                movie.Star = getOrder();
                 _context.Add(movie);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -165,9 +166,52 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // 刪除
             var movie = await _context.Movie.FindAsync(id);
             _context.Movie.Remove(movie);
             await _context.SaveChangesAsync();
+
+            // 更新所有項目順序
+            var movies = from m in _context.Movie
+                         orderby m.Star
+                         select m.Id;
+
+            int[] movieArray = await movies.ToArrayAsync(); // 將結果轉陣列
+            //int[] movies = new int[] { 10, 11 };
+
+            int index = 1;
+            foreach (int movieId in movieArray)
+            {
+                Console.WriteLine("debug : {0}", movieId);
+
+                movie = await _context.Movie.FindAsync(movieId);
+                if (movie == null)
+                {
+                    return NotFound();
+                }
+
+                movie.Star = index;
+
+                try
+                {
+                    _context.Update(movie);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!MovieExists(movie.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                index++;
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -183,12 +227,14 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
+            // 找出來源
             var movie = await _context.Movie.FindAsync(id);
             if (movie == null)
             {
                 return NotFound();
             }
 
+            // 新增
             Movie nmovie = new Movie()
             {
                 Title = movie.Title + "-copy",
@@ -196,9 +242,8 @@ namespace WebApplication1.Controllers
                 Genre = movie.Genre,
                 Price = movie.Price,
                 Rating = movie.Rating,
-                Star = movie.Star
+                Star = getOrder()
             };
-
             _context.Add(nmovie);
             await _context.SaveChangesAsync();
 
@@ -221,9 +266,8 @@ namespace WebApplication1.Controllers
                     return NotFound();
                 }
 
+                // 更新順序
                 movie.Star = index;
-                index++;
-
                 try
                 {
                     _context.Update(movie);
@@ -240,9 +284,20 @@ namespace WebApplication1.Controllers
                         throw;
                     }
                 }
+
+                index++;
             }
 
             return Json("success");
+        }
+
+        // 取得順序編號
+        private int getOrder()
+        {
+            var movies = from m in _context.Movie
+                         select m;
+
+            return movies.Count() + 1;
         }
     }
 }

@@ -4,6 +4,12 @@
     ViewData["Title"] = "Index";
 }
 
+<style>
+    .moveColor {
+        background-color: lightblue;
+    }
+</style>
+
 <h1>Index</h1>
 
 <p>
@@ -23,6 +29,9 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.Movies[0].Star)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Movies[0].Title)
             </th>
             <th>
@@ -37,41 +46,38 @@
             <th>
                 @Html.DisplayNameFor(model => model.Movies[0].Rating)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Movies[0].Star)
-            </th>
             <th></th>
         </tr>
     </thead>
     <tbody id="items">
         @foreach (var item in Model.Movies)
         {
-            <tr data-id="@Html.DisplayFor(modelItem => item.Id)">
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ReleaseDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Genre)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Rating)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Star)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                    <a asp-action="Copy" asp-route-id="@item.Id">Copy</a>
-                </td>
-            </tr>
+        <tr data-id="@Html.DisplayFor(modelItem => item.Id)">
+            <td>
+                @Html.DisplayFor(modelItem => item.Star)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReleaseDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Genre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rating)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                <a asp-action="Copy" asp-route-id="@item.Id">Copy</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
@@ -85,6 +91,7 @@
         let el = document.getElementById('items');
         sortable = Sortable.create(el, {
             animation: 250,
+            ghostClass: 'moveColor',
             // handle: '.orderBtn',
             onEnd: orderItem
         });
